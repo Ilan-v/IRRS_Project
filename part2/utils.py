@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np 
-from config import TRAIN_PATH, USER_COL_NAME_IN_DATAEST, ITEM_COL_NAME_IN_DATASET, USER_COL, ITEM_COL, VALIDATION_PATH, \
-    RATING_COL, RATING_COL_NAME_IN_DATASET
+from config import *
 
 
 def transform_data_to_internal_indexes(data: pd.DataFrame, user_map, item_map) -> pd.DataFrame:

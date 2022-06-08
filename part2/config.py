@@ -15,7 +15,7 @@ ITEMS_COL_INDEX = 1
 RATINGS_COL_INDEX = 2
 
 BASELINE_PARAMS_FILE_PATH = 'learned_paramaters/baseline_params.pickle'
-
+POPULARITY_DIFFERENCES_PARAMS_FILE_PATH = 'learned_paramaters/popularity_differences_params.pickle'
 CORRELATION_PARAMS_FILE_PATH = 'learned_paramaters/correlation_params.csv'
 CSV_COLUMN_NAMES = ['item_1', 'item_2', 'sim']
 

@@ -4,6 +4,7 @@ from tqdm import tqdm
 from config import *
 import pickle
 import numpy as np
+from os import path
 
 class SlopeOne(Regressor):
     def __init__(self):
@@ -11,29 +12,47 @@ class SlopeOne(Regressor):
         self.ui_mtx = None
 
     def fit(self, X: np.array):
-       raise NotImplementedError
+        # check if params are already uploaded
+        if path.exists(POPULARITY_DIFFERENCES_PARAMS_FILE_PATH):
+            self.upload_params()
+            self.ui_mtx = create_ui_matrix(X)
+        else:
+            self.save_params(X)
+
 
     def build_popularity_difference_dict(self, data):
         # build user item matrix
-        if self.ui_mtx is None:
-            self.ui_mtx = create_ui_matrix(data)
+        self.ui_mtx = create_ui_matrix(data)
 
-        for i in tqdm(range(self.ui_matrix.shape[0])):
-            for j in range(self.ui_matrix.shape[1]):
-                if i!=j:
-                    ij_mtx = self.ui_matrix[:,[i,j]].copy()
-                    #get rows where both items are rated
-                    ij_mtx = ij_mtx[(ij_mtx>0).all(axis=1)]
-                    # calculate mean difference and update dict
-                    mean_diff = (ij_mtx[:,0] - ij_mtx[:,1]).mean()
-                    self.popularity_differences[(i,j)] = mean_diff
+        for i in tqdm(range(self.ui_mtx.shape[1])):
+            for j in range(i+1, self.ui_mtx.shape[1]):
+                ij_mtx = self.ui_mtx[:, [i,j]].copy()
+                # get rows where both items are rated
+                ij_mtx = ij_mtx[(ij_mtx > 0).all(axis=1)]
+                # num of users who rated both items
+                C_ij = ij_mtx.shape[0]
+                # calculate mean difference
+                if C_ij > 0:
+                    PD_ij = (ij_mtx[:,0] - ij_mtx[:,1]).mean()
+                else:
+                    PD_ij = 0
 
-        
-
+                self.popularity_differences[(i,j)] = (PD_ij, C_ij)
+                # Using symmetry for lower complexity
+                self.popularity_differences[(j,i)] = (-PD_ij, C_ij)
 
 
     def predict_on_pair(self, user: int, item: int):
-        raise NotImplementedError
+        r_ui = 0
+        total_C = 0
+        for v in range(self.ui_mtx.shape[1]):
+            # take only items the user rated
+            if v != item and self.ui_mtx[user,v] > 0:
+                PD, C = self.popularity_differences[(item,v)]
+                r_ui += (PD + self.ui_mtx[user,v]) * C
+                total_C += C
+
+        return r_ui / total_C
 
     def upload_params(self):
         # read existing pickle file with params

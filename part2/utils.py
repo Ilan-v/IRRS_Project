@@ -46,7 +46,7 @@ def create_ui_matrix(data: np.array) -> np.array:
     ui_matrix = np.zeros((data[:, 0].max() + 1, data[:, 1].max() + 1))
     for user, item, rating in data:
         ui_matrix[user, item] = rating
-    return ui_matrix
+    return ui_matrix.astype(int)
 
 class Config:
     def __init__(self, **kwargs):

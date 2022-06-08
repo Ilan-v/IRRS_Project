@@ -1,10 +1,10 @@
 import pandas as pd
-
+import numpy as np 
 from config import TRAIN_PATH, USER_COL_NAME_IN_DATAEST, ITEM_COL_NAME_IN_DATASET, USER_COL, ITEM_COL, VALIDATION_PATH, \
     RATING_COL, RATING_COL_NAME_IN_DATASET
 
 
-def transform_data_to_internal_indexes(data: pd.DataFrame, user_map: Dict, item_map: Dict) -> pd.DataFrame:
+def transform_data_to_internal_indexes(data: pd.DataFrame, user_map, item_map) -> pd.DataFrame:
     data[USER_COL] = data[USER_COL_NAME_IN_DATAEST].map(user_map)
     data[ITEM_COL] = data[ITEM_COL_NAME_IN_DATASET].map(item_map)
     data[RATING_COL] = data[RATING_COL_NAME_IN_DATASET]
@@ -40,6 +40,14 @@ def get_data():
     
     return train, validation
 
+def create_ui_matrix(data: np.array) -> np.array:
+    """
+    creates a matrix of shape (n_users, n_items) where each cell contains the rating of the user for the item.
+    """
+    ui_matrix = np.zeros((data[:, 0].max() + 1, data[:, 1].max() + 1))
+    for user, item, rating in data:
+        ui_matrix[user, item] = rating
+    return ui_matrix
 
 class Config:
     def __init__(self, **kwargs):

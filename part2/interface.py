@@ -1,6 +1,5 @@
 from numpy import sqrt, square, array
 
-
 class Regressor:
     def __init__(self):
         raise NotImplementedError

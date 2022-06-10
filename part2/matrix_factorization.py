@@ -43,7 +43,8 @@ class MatrixFactorization(Regressor):
         self.item_bias = np.zeros(n_items)
         self.p = np.random.normal(0, 0.1, (self.k, n_users))
         self.q = np.random.normal(0, 0.1, (self.k, n_items))
-        self.mu = np.mean(ui_mtx)
+        # get mean of rating column in data
+        self.mu = np.mean(X[:, 2])
 
         # Calculating the RMSE for each epoch using SGD
         for epoch in range(self.epochs):

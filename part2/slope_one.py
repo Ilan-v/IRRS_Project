@@ -19,11 +19,10 @@ class SlopeOne(Regressor):
         else:
             self.save_params(X)
 
-
     def build_popularity_difference_dict(self, data):
         # build user item matrix
         self.ui_mtx = create_ui_matrix(data)
-
+        # loop over all items -> I*(I-1)/2
         for i in tqdm(range(self.ui_mtx.shape[1])):
             for j in range(i+1, self.ui_mtx.shape[1]):
                 ij_mtx = self.ui_mtx[:, [i,j]].copy()
@@ -33,13 +32,11 @@ class SlopeOne(Regressor):
                 C_ij = ij_mtx.shape[0]
                 # calculate mean difference
                 if C_ij > 0:
-                    PD_ij = (ij_mtx[:,0] - ij_mtx[:,1]).mean()
+                    PD_ij = (ij_mtx[:,0] - ij_mtx[:,1]).mean().astype(np.float32)
                 else:
                     PD_ij = 0
 
                 self.popularity_differences[(i,j)] = (PD_ij, C_ij)
-                # Using symmetry for lower complexity
-                self.popularity_differences[(j,i)] = (-PD_ij, C_ij)
 
 
     def predict_on_pair(self, user: int, item: int):
@@ -48,7 +45,13 @@ class SlopeOne(Regressor):
         for v in range(self.ui_mtx.shape[1]):
             # take only items the user rated
             if v != item and self.ui_mtx[user,v] > 0:
-                PD, C = self.popularity_differences[(item,v)]
+                # get the popularity difference, and the number of users who rated both items
+                if item < v:
+                    PD, C = self.popularity_differences[(item,v)]
+                else:
+                    PD, C = self.popularity_differences[(v,item)]
+                    PD = -PD
+
                 r_ui += (PD + self.ui_mtx[user,v]) * C
                 total_C += C
 

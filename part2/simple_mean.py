@@ -1,6 +1,6 @@
 from interface import Regressor
 from utils import get_data, create_ui_matrix
-import np
+import numpy as np
 
 class SimpleMean(Regressor):
     def __init__(self):
@@ -10,7 +10,7 @@ class SimpleMean(Regressor):
     def fit(self, X):
         ui_mtx = create_ui_matrix(X)
         # ui matrix but all zero values are converted to nan, for mean calculation
-        rating_mtx = ui_mtx.copy().astype(float)
+        rating_mtx = ui_mtx.copy().astype(np.float32)
         rating_mtx[rating_mtx == 0] = np.nan
         # calculate mean but ignore nans
         self.user_means = np.nanmean(rating_mtx, axis=1)

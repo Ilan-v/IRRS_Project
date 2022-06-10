@@ -1,7 +1,7 @@
 import numpy as np
 
 from interface import Regressor
-from utils import get_data, Config
+from utils import get_data, Config, create_ui_matrix
 
 
 class KnnItemSimilarity(Regressor):

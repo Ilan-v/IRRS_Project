@@ -22,7 +22,8 @@ class MatrixFactorization(Regressor):
         df = pd.DataFrame(covn_dict)
         print('MF train results:')
         print(df)
-        df.to_csv('results/mf_results.csv', index=False)
+        # save results (optional)- for gvarim only
+        # df.to_csv('results/mf_results.csv', index=False)
 
     def calc_regularization(self):
         return self.gamma * (

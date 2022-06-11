@@ -2,7 +2,7 @@ from interface import Regressor
 from utils import Config, get_data, create_ui_matrix
 from tqdm import tqdm
 import numpy as np
-
+import time
 
 class MatrixFactorization(Regressor):
     def __init__(self, config):
@@ -34,9 +34,10 @@ class MatrixFactorization(Regressor):
                 np.sum(self.p ** 2))
 
     def fit(self, X):
+        print ("Fitting MF model...")
+        start = time.time()
         # Initialize the model parameters
         ui_mtx = create_ui_matrix(X)
-
         n_users = ui_mtx.shape[0]
         n_items = ui_mtx.shape[1]
         self.user_bias = np.zeros(n_users)
@@ -56,6 +57,9 @@ class MatrixFactorization(Regressor):
             epoch_conv = {"train_objective": train_objective,
                           "train_mse": mse_train}
             self.record(epoch_conv)
+
+        end = time.time()
+        print(f"Fitting MF model done in {round(end - start,2)} seconds")
 
     def run_epoch(self, data: np.array):
         for row in tqdm(data, desc=f"Epoch {self.epoch}"):

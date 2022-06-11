@@ -1,5 +1,5 @@
 from numpy import sqrt, square, array
-
+from tqdm import tqdm
 class Regressor:
     def __init__(self):
         raise NotImplementedError
@@ -12,7 +12,7 @@ class Regressor:
 
     def calculate_rmse(self, data: array):
         e=0
-        for row in data:
+        for row in tqdm(data,desc="Calculating RMSE"):
             user, item, rating = row
             unknown_user = user < 0 or user > 6040
             unknown_item = item < 0 or item > 3224

@@ -32,11 +32,10 @@ class SlopeOne(Regressor):
                 C_ij = ij_mtx.shape[0]
                 # calculate mean difference
                 if C_ij > 0:
-                    PD_ij = (ij_mtx[:,0] - ij_mtx[:,1]).mean().astype(np.float32)
-                else:
-                    PD_ij = 0
+                    PD_ij = (ij_mtx[:, 0] - ij_mtx[:, 1]).mean().astype(np.float16)
+                    self.popularity_differences[(i, j)] = (PD_ij, C_ij)
 
-                self.popularity_differences[(i,j)] = (PD_ij, C_ij)
+
 
 
     def predict_on_pair(self, user: int, item: int):
@@ -47,9 +46,9 @@ class SlopeOne(Regressor):
             if v != item and self.ui_mtx[user,v] > 0:
                 # get the popularity difference, and the number of users who rated both items
                 if item < v:
-                    PD, C = self.popularity_differences[(item,v)]
+                    PD, C = self.popularity_differences.get((item, v), (0, 0))
                 else:
-                    PD, C = self.popularity_differences[(v,item)]
+                    PD, C = self.popularity_differences.get((v, item), (0, 0))
                     PD = -PD
 
                 r_ui += (PD + self.ui_mtx[user,v]) * C

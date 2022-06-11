@@ -2,6 +2,7 @@ from interface import Regressor
 from utils import Config, get_data, create_ui_matrix
 from tqdm import tqdm
 import numpy as np
+import pandas as pd
 import time
 
 class MatrixFactorization(Regressor):
@@ -18,13 +19,10 @@ class MatrixFactorization(Regressor):
         self.q = None
 
     def record(self, covn_dict):
-        epoch = "{:02d}".format(self.epoch)
-        temp = f"| epoch   # {epoch} :"
-        for key, value in covn_dict.items():
-            key = f"{key}"
-            val = '{:.4}'.format(value)
-            result = "{:<32}".format(F"  {key} : {val}")
-            temp += result
+        df = pd.DataFrame(covn_dict)
+        print('MF train results:')
+        print(df)
+        df.to_csv('results/mf_results.csv', index=False)
 
     def calc_regularization(self):
         return self.gamma * (
@@ -34,8 +32,9 @@ class MatrixFactorization(Regressor):
                 np.sum(self.p ** 2))
 
     def fit(self, X):
-        print ("Fitting MF model...")
+        print("Fitting MF model...")
         start = time.time()
+        res_dic = {'epoch': [], 'rmse': [], 'obj_func': []}
         # Initialize the model parameters
         ui_mtx = create_ui_matrix(X)
         n_users = ui_mtx.shape[0]
@@ -54,10 +53,11 @@ class MatrixFactorization(Regressor):
 
             mse_train = np.square(self.calculate_rmse(X))
             train_objective = mse_train * X.shape[0] + self.calc_regularization()
-            epoch_conv = {"train_objective": train_objective,
-                          "train_mse": mse_train}
-            self.record(epoch_conv)
+            res_dic['epoch'].append(epoch)
+            res_dic['rmse'].append(mse_train)
+            res_dic['obj_func'].append(train_objective)
 
+        self.record(res_dic)
         end = time.time()
         print(f"Fitting MF model done in {round(end - start,2)} seconds")
 

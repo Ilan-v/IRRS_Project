@@ -12,7 +12,7 @@ class KnnItemSimilarity(KnnUserSimilarity):
 
     def fit(self, X: np.array):
         """
-        Ovveride the fit method of the parent class, for inverted user item matrix
+        Override the fit method of the parent class, for inverted user item matrix
         """
         ui_mtx = create_ui_matrix(X)
         self.ui_mtx = ui_mtx.T
